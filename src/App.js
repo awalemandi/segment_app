@@ -4,6 +4,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import PublishIcon from '@material-ui/icons/Publish';
 import SlowMotionVideoIcon from '@material-ui/icons/SlowMotionVideo';
 
+import axios from 'axios';
+
 const useStyles = makeStyles( ( theme ) => ( {
   root: {
     marginTop: theme.spacing( 10 ),
@@ -25,38 +27,35 @@ const useStyles = makeStyles( ( theme ) => ( {
 function App () {
   const classes = useStyles();
   const [ loading, setLoading ] = useState( false );
-  const [ filePath, setFilePath ] = useState( '' );
+  const [ selectedVideo, setSelectedVideo ] = useState( null );
 
-  const handleChange = e => console.log( e.target.files[ 0 ] );
+  const handleChange = e => {
+    setSelectedVideo( e.target.files[ 0 ] );
+  };
+
+  const handleUploadVideo = () => {
+    if ( selectedVideo ) {
+      setLoading( true );
+      const data = new FormData();
+      data.append( 'video', selectedVideo );
+      data.append( 'name', selectedVideo.name );
+      axios.post( `/upload-video`, data )
+        .then( res => {
+          console.log( res );
+          setLoading( false );
+        } )
+        .catch( err => console.log( err ) );
+    }
+  };
 
   return (
     <Container component={ Paper } maxWidth={ 'md' } className={ classes.root }>
       <Typography variant='h4'>Video Segmentation App</Typography>
-      < label htmlFor="upload-photo">
-        <input
-          style={ { display: 'none' } }
-          id="upload-photo"
-          name="upload-photo"
-          type="file"
-          value={ filePath }
-          onChange={ handleChange }
-        />
-
-        <Tooltip title="Upload Video">
-          <Fab
-            color="primary"
-            size="large"
-            component="span"
-            aria-label="add"
-            variant="round"
-          >
-            <PublishIcon />
-          </Fab>
-        </Tooltip>
-        { filePath }
-      </label>
-
-      <Fab variant="extended" color="primary" aria-label="add" disabled={ loading } className={ classes.margin }>
+      <form onSubmit={ handleUploadVideo }>
+        <input type='file' name='video' id='video' onChange={ handleChange } />
+        <Button color='primary' variant='contained' type='submit' disabled={ loading }>Upload Video</Button>
+      </form>
+      <Fab variant="extended" color='secondary' aria-label="add" disabled={ loading } className={ classes.margin }>
         <SlowMotionVideoIcon className={ classes.extendedIcon } />
         { loading ? 'Processing..' : 'Process Video' }
       </Fab>

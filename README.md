@@ -1,10 +1,10 @@
-# Getting Started with Create React App
-
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
 ## Available Scripts
 
 In the project directory, you can run:
+
+### `npm start-flask-api`
+
+Runs the flask server on [http://127.0.0.1:5000/].
 
 ### `npm start`
 
